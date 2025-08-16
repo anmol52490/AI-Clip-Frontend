@@ -1,11 +1,14 @@
-# Use the official Nginx web server image as a base
+# Use the official Nginx web server image
 FROM nginx:alpine
 
-# Remove the default Nginx configuration file
-RUN rm /etc/nginx/conf.d/default.conf
+# Copy the Nginx configuration template
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Copy your custom Nginx configuration file into the container
-COPY nginx.conf /etc/nginx/conf.d
-
-# Copy your HTML, CSS, and JS files into the web server's public folder
+# Copy your HTML, CSS, and JS files
 COPY . /usr/share/nginx/html
+
+# Copy the startup script
+COPY entrypoint.sh /docker-entrypoint.d/20-envsubst-on-templates.sh
+
+# Make the startup script executable
+RUN chmod +x /docker-entrypoint.d/20-envsubst-on-templates.sh
